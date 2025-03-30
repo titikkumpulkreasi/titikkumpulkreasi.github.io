@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Image Generator</title>
+    <style>
+        :root {
+            --primary: #5e72e4;
+            --secondary: #11cdef;
+            --bg: #f8f9fe;
+            --text: #525f7f;
+            --light: #ffffff;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+        
+        .container {
+            text-align: center;
+            width: 90%;
+            max-width: 480px;
+            background-color: var(--light);
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
+        }
+        
+        h1 {
+            font-weight: 600;
+            margin-bottom: 32px;
+            font-size: 1.4rem;
+            color: var(--text);
+            letter-spacing: -0.5px;
+        }
+        
+        .loader {
+            position: relative;
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 32px;
+        }
+        
+        .orbit {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border: 2px solid transparent;
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 2s linear infinite;
+            filter: drop-shadow(0 0 8px rgba(94, 114, 228, 0.1));
+        }
+        
+        .orbit:nth-child(2) {
+            width: 70%;
+            height: 70%;
+            top: 15%;
+            left: 15%;
+            border-top-color: var(--secondary);
+            animation-direction: reverse;
+            animation-duration: 1.5s;
+        }
+        
+        .center-dot {
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        
+        .progress-container {
+            width: 100%;
+            margin: 24px 0;
+        }
+        
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 0.85rem;
+            color: var(--text);
+        }
+        
+        .progress-stage {
+            font-weight: 500;
+        }
+        
+        .progress-bar {
+            height: 6px;
+            background-color: rgba(82, 95, 127, 0.05);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            border-radius: 3px;
+            transition: width 0.4s ease;
+        }
+        
+        .console {
+            height: 160px;
+            overflow-y: auto;
+            background-color: rgba(248, 249, 254, 0.7);
+            padding: 16px;
+            border-radius: 8px;
+            text-align: left;
+            font-size: 13px;
+            margin-top: 24px;
+            border: 1px solid rgba(82, 95, 127, 0.08);
+        }
+        
+        .console-line {
+            margin: 6px 0;
+            padding-left: 16px;
+            position: relative;
+            line-height: 1.5;
+        }
+        
+        .console-line::before {
+            content: '•';
+            position: absolute;
+            left: 0;
+            color: var(--primary);
+        }
+        
+        .console-line.system {
+            color: rgba(82, 95, 127, 0.6);
+        }
+        
+        .console-line.processing {
+            color: var(--primary);
+        }
+        
+        .console-line.complete {
+            color: var(--secondary);
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Generating AI Image</h1>
+        
+        <div class="loader">
+            <div class="orbit"></div>
+            <div class="orbit"></div>
+            <div class="center-dot"></div>
+        </div>
+        
+        <div class="progress-container">
+            <div class="progress-info">
+                <span class="progress-stage" id="progressStage">Initializing</span>
+                <span id="percentage">0%</span>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressBar"></div>
+            </div>
+        </div>
+        
+        <div class="console" id="console">
+            <div class="console-line system">AI Image Generator v2.1 initialized</div>
+            <div class="console-line system">Starting image synthesis pipeline</div>
+        </div>
+    </div>
+
+    <script>
+        const consoleElement = document.getElementById('console');
+        const progressBar = document.getElementById('progressBar');
+        const percentageElement = document.getElementById('percentage');
+        const progressStageElement = document.getElementById('progressStage');
+        
+        const stages = [
+            { percent: 0, stage: "Initializing", messages: [
+                "Loading core AI models",
+                "Initializing neural processors",
+                "Allocating memory resources"
+            ]},
+            { percent: 15, stage: "Processing Prompt", messages: [
+                "Analyzing text input",
+                "Generating text embeddings",
+                "Building semantic understanding"
+            ]},
+            { percent: 30, stage: "Creating Latents", messages: [
+                "Initializing noise matrix",
+                "Calculating initial parameters",
+                "Setting up diffusion process"
+            ]},
+            { percent: 50, stage: "Refining Image", messages: [
+                "Running denoising steps",
+                "Applying attention layers",
+                "Optimizing composition"
+            ]},
+            { percent: 75, stage: "Finalizing", messages: [
+                "Enhancing details",
+                "Adjusting colors",
+                "Applying final touches"
+            ]},
+            { percent: 90, stage: "Exporting", messages: [
+                "Preparing output",
+                "Generating preview",
+                "Final quality check"
+            ]},
+            { percent: 100, stage: "Complete", messages: [
+                "Image generation successful",
+                "Output ready for download"
+            ]}
+        ];
+        
+        let currentStage = 0;
+        let progress = 0;
+        
+        function addConsoleMessage(message, type = "system") {
+            const newLine = document.createElement('div');
+            newLine.className = `console-line ${type}`;
+            newLine.textContent = message;
+            consoleElement.appendChild(newLine);
+            consoleElement.scrollTop = consoleElement.scrollHeight;
+        }
+        
+        function updateProgress() {
+            if (progress >= 100) {
+                progress = 0;
+                currentStage = 0;
+                consoleElement.innerHTML = '';
+                addConsoleMessage("AI Image Generator v2.1 initialized", "system");
+                addConsoleMessage("Starting new image synthesis pipeline", "system");
+            }
+            
+            // Check if we should move to next stage
+            if (currentStage < stages.length - 1 && progress >= stages[currentStage + 1].percent) {
+                currentStage++;
+                progressStageElement.textContent = stages[currentStage].stage;
+                
+                // Add stage messages
+                stages[currentStage].messages.forEach((msg, i) => {
+                    setTimeout(() => {
+                        addConsoleMessage(msg, currentStage === stages.length - 1 ? "complete" : "processing");
+                    }, i * 300);
+                });
+            }
+            
+            progressBar.style.width = `${progress}%`;
+            percentageElement.textContent = `${Math.min(100, Math.round(progress))}%`;
+            
+            // Vary progress speed
+            let increment = 0.3;
+            if (progress > 80) increment = 0.15;
+            if (progress > 95) increment = 0.05;
+            
+            progress += increment;
+            
+            setTimeout(updateProgress, 50 + Math.random() * 100);
+        }
+        
+        // Start with initial messages
+        setTimeout(() => {
+            addConsoleMessage("Loading Stable Diffusion model", "processing");
+            setTimeout(() => {
+                addConsoleMessage("Model loaded successfully", "complete");
+                updateProgress();
+            }, 800);
+        }, 500);
+    </script>
+</body>
+                                 </html>
