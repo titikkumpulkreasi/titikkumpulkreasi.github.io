@@ -3,14 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Image Generator</title>
+    <title>Titik Kumpul Kreasi</title>
     <style>
         :root {
-            --primary: #5e72e4;
-            --secondary: #11cdef;
-            --bg: #f8f9fe;
-            --text: #525f7f;
-            --light: #ffffff;
+            --primary: #6C5CE7;
+            --secondary: #00CEC9;
+            --bg: #F9F9F9;
+            --text: #2D3436;
+            --light: #FFFFFF;
+            --console-bg: #232323;
+            --glass-bg: rgba(255, 255, 255, 0.85);
+            --ai-color: #FF6B6B;
         }
         
         body {
@@ -24,85 +27,102 @@
             height: 100vh;
             margin: 0;
             overflow: hidden;
+            position: relative;
+        }
+        
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            opacity: 0.1;
+            animation: gradientShift 15s ease infinite alternate;
+            background-size: 200% 200%;
         }
         
         .container {
             text-align: center;
             width: 90%;
             max-width: 480px;
-            background-color: var(--light);
+            background: var(--glass-bg);
             border-radius: 16px;
-            padding: 40px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.03);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            transition: all 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+            animation: pulse 3s infinite ease-in-out;
         }
         
         h1 {
-            font-weight: 600;
-            margin-bottom: 32px;
-            font-size: 1.4rem;
-            color: var(--text);
+            font-weight: 700;
+            margin-bottom: 8px;
+            font-size: 1.8rem;
+            color: var(--primary);
             letter-spacing: -0.5px;
         }
         
-        .loader {
-            position: relative;
-            width: 80px;
-            height: 80px;
-            margin: 0 auto 32px;
+        .subtitle {
+            color: var(--text);
+            opacity: 0.7;
+            margin-bottom: 24px;
+            font-size: 0.95rem;
         }
         
-        .orbit {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            border: 2px solid transparent;
-            border-top-color: var(--primary);
+        .dot-spinner {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 50px;
+            margin: 16px 0;
+        }
+        
+        .dot {
+            width: 10px;
+            height: 10px;
+            background-color: var(--primary);
             border-radius: 50%;
-            animation: spin 2s linear infinite;
-            filter: drop-shadow(0 0 8px rgba(94, 114, 228, 0.1));
+            margin: 0 4px;
+            animation: bounce 1.2s infinite ease-in-out;
         }
         
-        .orbit:nth-child(2) {
-            width: 70%;
-            height: 70%;
-            top: 15%;
-            left: 15%;
-            border-top-color: var(--secondary);
-            animation-direction: reverse;
-            animation-duration: 1.5s;
-        }
-        
-        .center-dot {
-            position: absolute;
-            width: 16px;
-            height: 16px;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            border-radius: 50%;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-        }
+        .dot:nth-child(1) { animation-delay: 0s; }
+        .dot:nth-child(2) { animation-delay: 0.15s; }
+        .dot:nth-child(3) { animation-delay: 0.3s; }
+        .dot:nth-child(4) { animation-delay: 0.45s; }
         
         .progress-container {
-            width: 100%;
-            margin: 24px 0;
-        }
-        
-        .progress-info {
             display: flex;
-            justify-content: space-between;
-            margin-bottom: 8px;
-            font-size: 0.85rem;
-            color: var(--text);
+            align-items: center;
+            margin: 20px 0;
+            gap: 10px;
+            position: relative;
         }
         
-        .progress-stage {
-            font-weight: 500;
+        .progress-text {
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            color: var(--primary);
+            min-width: 40px;
+        }
+        
+        .eta-text {
+            position: absolute;
+            right: 0;
+            bottom: -18px;
+            font-size: 0.7rem;
+            color: var(--text);
+            opacity: 0.7;
         }
         
         .progress-bar {
+            flex-grow: 1;
             height: 6px;
-            background-color: rgba(82, 95, 127, 0.05);
+            background-color: rgba(108, 92, 231, 0.1);
             border-radius: 3px;
             overflow: hidden;
         }
@@ -112,176 +132,490 @@
             width: 0%;
             background: linear-gradient(90deg, var(--primary), var(--secondary));
             border-radius: 3px;
-            transition: width 0.4s ease;
+            transition: width 0.8s cubic-bezier(0.65, 0, 0.35, 1);
+        }
+        
+        .descriptive-text {
+            margin: 20px 0;
+            min-height: 20px;
+            font-size: 0.9rem;
+            color: var(--text);
+            opacity: 0.9;
+            text-align: center;
+            transition: opacity 0.3s ease;
+        }
+        
+        .ai-badge {
+            display: inline-block;
+            background-color: rgba(255, 107, 107, 0.1);
+            color: var(--ai-color);
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            margin: 0 2px;
+            border: 1px solid rgba(255, 107, 107, 0.3);
         }
         
         .console {
-            height: 160px;
+            height: 150px;
             overflow-y: auto;
-            background-color: rgba(248, 249, 254, 0.7);
-            padding: 16px;
+            background-color: var(--console-bg);
+            color: #B8B8B8;
             border-radius: 8px;
+            padding: 12px;
+            margin-top: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.8rem;
             text-align: left;
-            font-size: 13px;
-            margin-top: 24px;
-            border: 1px solid rgba(82, 95, 127, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
         
         .console-line {
-            margin: 6px 0;
-            padding-left: 16px;
-            position: relative;
-            line-height: 1.5;
+            margin: 4px 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            transition: opacity 0.3s ease;
         }
         
         .console-line::before {
-            content: '•';
+            content: '> ';
+            color: #51BA5E;
+        }
+        
+        .process-timeline {
+            display: flex;
+            justify-content: space-between;
+            margin: 20px 0;
+            position: relative;
+        }
+        
+        .process-timeline::before {
+            content: '';
             position: absolute;
+            top: 50%;
             left: 0;
+            right: 0;
+            height: 2px;
+            background: rgba(108, 92, 231, 0.2);
+            z-index: 0;
+        }
+        
+        .step {
+            position: relative;
+            padding: 5px 10px;
+            font-size: 0.7rem;
+            background: var(--light);
+            border-radius: 12px;
+            z-index: 1;
+            color: var(--text);
+            opacity: 0.6;
+            transition: all 0.3s ease;
+        }
+        
+        .step.active {
+            opacity: 1;
             color: var(--primary);
+            font-weight: bold;
+            transform: scale(1.05);
         }
         
-        .console-line.system {
-            color: rgba(82, 95, 127, 0.6);
+        .system-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            margin: 15px 0;
+            color: var(--text);
+            opacity: 0.7;
         }
         
-        .console-line.processing {
+        .debug-btn {
+            background: transparent;
+            border: 1px solid var(--primary);
             color: var(--primary);
+            border-radius: 20px;
+            padding: 5px 15px;
+            font-size: 0.7rem;
+            margin-top: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
         }
         
-        .console-line.complete {
-            color: var(--secondary);
+        .debug-btn:hover {
+            background: var(--primary);
+            color: white;
         }
         
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        .debug-info {
+            margin-top: 15px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.05);
+            border-radius: 8px;
+            text-align: left;
+            font-size: 0.8rem;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease, padding 0.5s ease;
+        }
+        
+        .debug-info.visible {
+            max-height: 300px;
+            padding: 15px;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); background-color: var(--secondary); }
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 0.95; transform: scale(0.995); }
+            50% { opacity: 1; transform: scale(1.005); }
+            100% { opacity: 0.95; transform: scale(0.995); }
+        }
+        
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
     </style>
 </head>
 <body>
+    <div class="bg-animation"></div>
+    
     <div class="container">
-        <h1>Generating AI Image</h1>
+        <h1>Titik Kumpul Kreasi</h1>
+        <div class="subtitle">Platform Kolaborasi Kreatif Digital <span class="ai-badge">AI-Powered</span></div>
         
-        <div class="loader">
-            <div class="orbit"></div>
-            <div class="orbit"></div>
-            <div class="center-dot"></div>
+        <div class="process-timeline">
+            <div class="step active">Inisialisasi</div>
+            <div class="step">Integrasi AI</div>
+            <div class="step">Optimasi</div>
+            <div class="step">Kolaborasi</div>
+        </div>
+        
+        <div class="dot-spinner">
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
         </div>
         
         <div class="progress-container">
-            <div class="progress-info">
-                <span class="progress-stage" id="progressStage">Initializing</span>
-                <span id="percentage">0%</span>
-            </div>
+            <div class="progress-text" id="progressText">0%</div>
             <div class="progress-bar">
                 <div class="progress-fill" id="progressBar"></div>
             </div>
+            <div class="eta-text" id="etaText"></div>
         </div>
         
+        <div class="system-info">
+            <div>Model AI: <span id="activeModel">Stable Diffusion 3</span></div>
+            <div>API: <span id="lastProcess">Hugging Face</span></div>
+            <div>Versi: <span id="systemVersion">2.3.1</span></div>
+        </div>
+        
+        <div class="descriptive-text" id="descriptiveText">Mempersiapkan sistem kolaborasi...</div>
+        
         <div class="console" id="console">
-            <div class="console-line system">AI Image Generator v2.1 initialized</div>
-            <div class="console-line system">Starting image synthesis pipeline</div>
+            <div class="console-line">System initialized with AI integration</div>
+        </div>
+        
+        <button id="toggleDebug" class="debug-btn">Show Technical Details</button>
+        <div id="debugInfo" class="debug-info">
+            <h3>AI System Details</h3>
+            <pre id="systemDetails">Loading AI system information...</pre>
         </div>
     </div>
 
     <script>
-        const consoleElement = document.getElementById('console');
-        const progressBar = document.getElementById('progressBar');
-        const percentageElement = document.getElementById('percentage');
-        const progressStageElement = document.getElementById('progressStage');
-        
-        const stages = [
-            { percent: 0, stage: "Initializing", messages: [
-                "Loading core AI models",
-                "Initializing neural processors",
-                "Allocating memory resources"
-            ]},
-            { percent: 15, stage: "Processing Prompt", messages: [
-                "Analyzing text input",
-                "Generating text embeddings",
-                "Building semantic understanding"
-            ]},
-            { percent: 30, stage: "Creating Latents", messages: [
-                "Initializing noise matrix",
-                "Calculating initial parameters",
-                "Setting up diffusion process"
-            ]},
-            { percent: 50, stage: "Refining Image", messages: [
-                "Running denoising steps",
-                "Applying attention layers",
-                "Optimizing composition"
-            ]},
-            { percent: 75, stage: "Finalizing", messages: [
-                "Enhancing details",
-                "Adjusting colors",
-                "Applying final touches"
-            ]},
-            { percent: 90, stage: "Exporting", messages: [
-                "Preparing output",
-                "Generating preview",
-                "Final quality check"
-            ]},
-            { percent: 100, stage: "Complete", messages: [
-                "Image generation successful",
-                "Output ready for download"
-            ]}
+        // Daftar platform AI terkini
+        const aiPlatforms = [
+            "DALL-E 3", "Midjourney", "Leonardo", "Meta AI", "Bing AI", 
+            "Stable Diffusion", "Imagen 3", "Recraft V3", "Playground AI", 
+            "TensorFlow", "Runway ML", "GPT-4o", "DeepSeek", "Kling", 
+            "Hugging Face", "Claude 3", "Gemini", "Cohere", "Anthropic",
+            "Firefly", "SDXL", "Pika Labs", "Sora", "Stability AI"
+        ];
+
+        // Daftar model AI
+        const aiModels = [
+            "Stable Diffusion 3", "GPT-4 Turbo", "Claude 3 Opus", "Gemini Pro", 
+            "DALL-E 3", "Midjourney V6", "Imagen 3", "SDXL-Lightning", 
+            "DeepSeek-V3", "LLaMA 3", "Mistral 7B", "Phi-3", "Command R+"
+        ];
+
+        // Daftar API AI
+        const aiApis = [
+            "Hugging Face", "OpenAI", "Anthropic", "Google AI", "Azure AI",
+            "AWS Bedrock", "Runway API", "Stability API", "Firebase ML",
+            "TensorFlow Serving", "ONNX Runtime", "PyTorch Live"
+        ];
+
+        // Descriptive texts dengan integrasi platform AI
+        const descriptiveTexts = [
+            `Menghubungkan jaringan kreator dengan <span class="ai-badge">${aiPlatforms[Math.floor(Math.random() * aiPlatforms.length)]}</span>...`,
+            `Memuat alat desain digital dari <span class="ai-badge">${aiPlatforms[Math.floor(Math.random() * aiPlatforms.length)]}</span>...`,
+            `Menyiapkan ruang kolaborasi dengan <span class="ai-badge">${aiPlatforms[Math.floor(Math.random() * aiPlatforms.length)]}</span>...`,
+            `Mengoptimalkan performa sistem dengan <span class="ai-badge">${aiModels[Math.floor(Math.random() * aiModels.length)]}</span>...`,
+            `Memverifikasi lisensi kreatif melalui <span class="ai-badge">${aiApis[Math.floor(Math.random() * aiApis.length)]}</span>...`,
+            `Menyinkronkan proyek terkini dengan <span class="ai-badge">${aiPlatforms[Math.floor(Math.random() * aiPlatforms.length)]}</span>...`,
+            `Menganalisis tren desain menggunakan <span class="ai-badge">${aiModels[Math.floor(Math.random() * aiModels.length)]}</span>...`,
+            `Memproses permintaan kolaborasi via <span class="ai-badge">${aiApis[Math.floor(Math.random() * aiApis.length)]}</span>...`,
+            `Memperbarui galeri inspirasi dari <span class="ai-badge">${aiPlatforms[Math.floor(Math.random() * aiPlatforms.length)]}</span>...`,
+            `Memeriksa pembaruan sistem untuk <span class="ai-badge">${aiModels[Math.floor(Math.random() * aiModels.length)]}</span>...`,
+            `Menghubungkan penyimpanan cloud dengan <span class="ai-badge">${aiPlatforms[Math.floor(Math.random() * aiPlatforms.length)]}</span>...`,
+            `Memvalidasi aset digital menggunakan <span class="ai-badge">${aiModels[Math.floor(Math.random() * aiModels.length)]}</span>...`,
+            `Menyiapkan notifikasi real-time via <span class="ai-badge">${aiApis[Math.floor(Math.random() * aiApis.length)]}</span>...`,
+            `Mengaktifkan fitur kolaborasi dengan <span class="ai-badge">${aiPlatforms[Math.floor(Math.random() * aiPlatforms.length)]}</span>...`,
+            `Menyelesaikan proses inisialisasi <span class="ai-badge">${aiModels[Math.floor(Math.random() * aiModels.length)]}</span>...`
         ];
         
-        let currentStage = 0;
-        let progress = 0;
+        // Independent console messages dengan integrasi AI
+        const consoleMessages = [
+            `Membaca konfigurasi sistem untuk ${aiModels[Math.floor(Math.random() * aiModels.length)]}...`,
+            `Memeriksa koneksi database ${aiApis[Math.floor(Math.random() * aiApis.length)]}...`,
+            `Memuat modul kreativitas ${aiModels[Math.floor(Math.random() * aiModels.length)]}...`,
+            `Menyiapkan API ${aiApis[Math.floor(Math.random() * aiApis.length)]}...`,
+            `Memverifikasi sertifikat keamanan ${aiPlatforms[Math.floor(Math.random() * aiPlatforms.length)]}...`,
+            `Menginisialisasi cache proyek dengan ${aiModels[Math.floor(Math.random() * aiModels.length)]}...`,
+            `Memeriksa integritas sistem ${aiPlatforms[Math.floor(Math.random() * aiPlatforms.length)]}...`,
+            `Memuat plugin desain dari ${aiPlatforms[Math.floor(Math.random() * aiPlatforms.length)]}...`,
+            `Menyiapkan lingkungan pengembangan ${aiApis[Math.floor(Math.random() * aiApis.length)]}...`,
+            `Memeriksa pembaruan komponen ${aiModels[Math.floor(Math.random() * aiModels.length)]}...`
+        ];
         
-        function addConsoleMessage(message, type = "system") {
-            const newLine = document.createElement('div');
-            newLine.className = `console-line ${type}`;
-            newLine.textContent = message;
-            consoleElement.appendChild(newLine);
-            consoleElement.scrollTop = consoleElement.scrollHeight;
+        // System processes for timeline
+        const systemProcesses = [
+            "Inisialisasi",
+            "Integrasi AI",
+            "Optimasi",
+            "Kolaborasi"
+        ];
+        
+        const consoleElement = document.getElementById('console');
+        const progressBar = document.getElementById('progressBar');
+        const progressText = document.getElementById('progressText');
+        const descriptiveText = document.getElementById('descriptiveText');
+        const etaText = document.getElementById('etaText');
+        const activeModelElement = document.getElementById('activeModel');
+        const lastProcessElement = document.getElementById('lastProcess');
+        const systemVersionElement = document.getElementById('systemVersion');
+        const toggleDebugButton = document.getElementById('toggleDebug');
+        const debugInfo = document.getElementById('debugInfo');
+        const systemDetails = document.getElementById('systemDetails');
+        const timelineSteps = document.querySelectorAll('.step');
+        
+        let progress = 0;
+        let shownTextIndices = [];
+        let direction = 1;
+        let lastUpdateTime = 0;
+        let lastConsoleUpdate = 0;
+        let currentProcessIndex = 0;
+        let debugVisible = false;
+        
+        // Update model AI secara acak
+        function updateAIModel() {
+            activeModelElement.textContent = aiModels[Math.floor(Math.random() * aiModels.length)];
+            lastProcessElement.textContent = aiApis[Math.floor(Math.random() * aiApis.length)];
+            setTimeout(updateAIModel, 8000 + Math.random() * 10000);
+        }
+        
+        function getRandomUnshownTextIndex() {
+            if (shownTextIndices.length >= descriptiveTexts.length) {
+                shownTextIndices = [];
+            }
+            
+            const availableIndices = [];
+            for (let i = 0; i < descriptiveTexts.length; i++) {
+                if (!shownTextIndices.includes(i)) {
+                    availableIndices.push(i);
+                }
+            }
+            
+            if (availableIndices.length > 0) {
+                const randomIndex = Math.floor(Math.random() * availableIndices.length);
+                return availableIndices[randomIndex];
+            }
+            
+            return 0;
         }
         
         function updateProgress() {
-            if (progress >= 100) {
-                progress = 0;
-                currentStage = 0;
-                consoleElement.innerHTML = '';
-                addConsoleMessage("AI Image Generator v2.1 initialized", "system");
-                addConsoleMessage("Starting new image synthesis pipeline", "system");
+            const now = Date.now();
+            if (now - lastUpdateTime < 100) {
+                requestAnimationFrame(updateProgress);
+                return;
+            }
+            lastUpdateTime = now;
+            
+            // Random direction change
+            if (Math.random() < 0.02) {
+                direction *= -1;
             }
             
-            // Check if we should move to next stage
-            if (currentStage < stages.length - 1 && progress >= stages[currentStage + 1].percent) {
-                currentStage++;
-                progressStageElement.textContent = stages[currentStage].stage;
-                
-                // Add stage messages
-                stages[currentStage].messages.forEach((msg, i) => {
-                    setTimeout(() => {
-                        addConsoleMessage(msg, currentStage === stages.length - 1 ? "complete" : "processing");
-                    }, i * 300);
-                });
-            }
+            // Calculate progress change
+            let change = direction * (1 + Math.random() * 3);
             
+            // Adjust change when approaching boundaries
+            if (progress > 90) change = -Math.abs(change);
+            if (progress < 10) change = Math.abs(change);
+            
+            progress += change;
+            progress = Math.max(0, Math.min(100, progress));
+            
+            // Update progress display
             progressBar.style.width = `${progress}%`;
-            percentageElement.textContent = `${Math.min(100, Math.round(progress))}%`;
+            progressText.textContent = `${Math.round(progress)}%`;
+            updateETA();
             
-            // Vary progress speed
-            let increment = 0.3;
-            if (progress > 80) increment = 0.15;
-            if (progress > 95) increment = 0.05;
+            // Update timeline based on progress
+            updateTimeline();
             
-            progress += increment;
+            // Change descriptive text randomly but without repetition
+            if (Math.random() < 0.1) {
+                const newTextIndex = getRandomUnshownTextIndex();
+                shownTextIndices.push(newTextIndex);
+                
+                descriptiveText.style.opacity = 0;
+                setTimeout(() => {
+                    descriptiveText.innerHTML = descriptiveTexts[newTextIndex];
+                    descriptiveText.style.opacity = 1;
+                }, 300);
+            }
             
-            setTimeout(updateProgress, 50 + Math.random() * 100);
+            requestAnimationFrame(updateProgress);
         }
         
-        // Start with initial messages
-        setTimeout(() => {
-            addConsoleMessage("Loading Stable Diffusion model", "processing");
-            setTimeout(() => {
-                addConsoleMessage("Model loaded successfully", "complete");
-                updateProgress();
-            }, 800);
-        }, 500);
+        function updateETA() {
+            const remaining = 100 - progress;
+            const eta = Math.max(5, Math.round(remaining / (1 + Math.random() * 3)));
+            etaText.textContent = `~${eta}s remaining`;
+        }
+        
+        function updateTimeline() {
+            const progressThresholds = [25, 50, 75];
+            const newProcessIndex = progressThresholds.findIndex(t => progress < t);
+            const targetIndex = newProcessIndex === -1 ? progressThresholds.length : newProcessIndex;
+            
+            if (targetIndex !== currentProcessIndex) {
+                timelineSteps.forEach((step, index) => {
+                    if (index === targetIndex) {
+                        step.classList.add('active');
+                    } else {
+                        step.classList.remove('active');
+                    }
+                });
+                currentProcessIndex = targetIndex;
+            }
+        }
+        
+        function updateConsole() {
+            const now = Date.now();
+            if (now - lastConsoleUpdate < 2000) {
+                setTimeout(updateConsole, 100);
+                return;
+            }
+            lastConsoleUpdate = now;
+            
+            // Add random console message
+            const randomMessage = consoleMessages[Math.floor(Math.random() * consoleMessages.length)];
+            const newLine = document.createElement('div');
+            newLine.className = 'console-line';
+            newLine.textContent = randomMessage;
+            consoleElement.appendChild(newLine);
+            
+            // Keep console at a reasonable size
+            if (consoleElement.children.length > 15) {
+                consoleElement.removeChild(consoleElement.children[0]);
+            }
+            
+            consoleElement.scrollTop = consoleElement.scrollHeight;
+            
+            setTimeout(updateConsole, 1000 + Math.random() * 2000);
+        }
+        
+        function updateSystemDetails() {
+            const currentModel = activeModelElement.textContent;
+            const currentAPI = lastProcessElement.textContent;
+            const randomPlatform = aiPlatforms[Math.floor(Math.random() * aiPlatforms.length)];
+            
+            const details = {
+                "AI Model Active": currentModel,
+                "API Connected": currentAPI,
+                "AI Platform": randomPlatform,
+                "System Time": new Date().toLocaleTimeString(),
+                "User Agent": navigator.userAgent,
+                "CPU Cores": navigator.hardwareConcurrency,
+                "Memory": `${(performance.memory ? (performance.memory.jsHeapSizeLimit / 7824 / 5324).toFixed(1) : 'N/A')} TB`,
+                "Connection": navigator.connection ? navigator.connection.effectiveType : 'N/A',
+                "Current Progress": `${Math.round(progress)}%`,
+                "Active Processes": systemProcesses[currentProcessIndex],
+                "Supported AI Models": aiModels.slice(0, 5).join(', ') + '...',
+                "Available APIs": aiApis.slice(0, 3).join(', ') + '...'
+            };
+            
+            systemDetails.textContent = Object.entries(details)
+                .map(([key, value]) => `${key}: ${value}`)
+                .join('\n');
+            
+            setTimeout(updateSystemDetails, 5000);
+        }
+        
+        // Console hover effect
+        consoleElement.addEventListener('mouseover', () => {
+            document.querySelectorAll('.console-line').forEach(line => {
+                line.style.opacity = '1';
+            });
+        });
+        
+        consoleElement.addEventListener('mouseout', () => {
+            document.querySelectorAll('.console-line').forEach((line, i) => {
+                line.style.opacity = `${1 - (i * 0.05)}`;
+            });
+        });
+        
+        // Toggle debug info
+        toggleDebugButton.addEventListener('click', () => {
+            debugVisible = !debugVisible;
+            debugInfo.classList.toggle('visible', debugVisible);
+            toggleDebugButton.textContent = debugVisible ? 'Hide Technical Details' : 'Show Technical Details';
+            
+            if (debugVisible) {
+                updateSystemDetails();
+            }
+        });
+        
+        // Initialize battery info if available
+        if (navigator.getBattery) {
+            navigator.getBattery().then(battery => {
+                const updateBatteryInfo = () => {
+                    const batteryDetails = `Battery: ${Math.floor(battery.level * 100)}% ${battery.charging ? '(charging)' : ''}`;
+                    if (debugVisible) {
+                        const currentText = systemDetails.textContent;
+                        systemDetails.textContent = currentText.replace(
+                            /Battery: .*/,
+                            batteryDetails
+                        );
+                    }
+                };
+                
+                battery.addEventListener('levelchange', updateBatteryInfo);
+                battery.addEventListener('chargingchange', updateBatteryInfo);
+                updateBatteryInfo();
+            });
+        }
+        
+        // Start animations
+        updateProgress();
+        updateConsole();
+        updateAIModel();
+        
+        // Initialize console lines opacity
+        document.querySelectorAll('.console-line').forEach((line, i) => {
+            line.style.opacity = `${1 - (i * 0.05)}`;
+        });
     </script>
 </body>
-                                 </html>
+</html>
