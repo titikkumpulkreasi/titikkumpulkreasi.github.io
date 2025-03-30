@@ -32,303 +32,400 @@
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="icon.png">
     <link rel="apple-touch-icon" sizes="180x180" href="icon.png">
-    <style>
-        :root {
-            --primary: #6C5CE7;
-            --secondary: #00CEC9;
-            --ai-accent: #FF6B6B;
-            --success: #52BE80;
-            --bg: #F9F9F9;
-            --text: #2D3436;
-            --light: #FFFFFF;
-        }
-        
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background-color: var(--bg);
-            color: var(--text);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            overflow: hidden;
-        }
-        
-        .installation-container {
-            width: 90%;
-            max-width: 600px;
-            background: rgba(255, 255, 255, 0.92);
-            border-radius: 24px;
-            padding: 30px;
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.08);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.25);
-            text-align: center;
-        }
-        
-        h1 {
-            font-weight: 800;
-            margin-bottom: 15px;
-            background: linear-gradient(90deg, var(--primary), var(--ai-accent));
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-        }
-        .ai-badge {
-            display: inline-block;
-            background-color: rgba(255, 107, 107, 0.15);
-            color: var(--ai-accent);
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            margin: 0 3px;
-            border: 1px solid rgba(255, 107, 107, 0.3);
-        }
-        
-        .progress-container {
-            margin: 30px 0;
-        }
-        
-        .progress-bar {
-            height: 10px;
-            background-color: rgba(108, 92, 231, 0.1);
-            border-radius: 5px;
-            overflow: hidden;
-            margin-bottom: 10px;
-        }
-        
-        .progress-fill {
-            height: 100%;
-            width: 0%;
-            background: linear-gradient(90deg, var(--primary), var(--secondary));
-            border-radius: 5px;
-            transition: width 0.5s ease-out;
-        }
-        
-        .progress-text {
-            font-family: 'Courier New', monospace;
-            font-weight: bold;
-            color: var(--primary);
-        }
-        
-        .status-message {
-            min-height: 60px;
-            margin: 20px 0;
-            font-size: 0.9rem;
-            color: var(--text);
-            opacity: 0.8;
-        }
-        
-        .loading-spinner {
-            width: 50px;
-            height: 50px;
-            border: 5px solid rgba(108, 92, 231, 0.1);
-            border-top-color: var(--primary);
-            border-radius: 50%;
-            margin: 20px auto;
-            animation: spin 1s linear infinite;
-            display: none;
-        }
-        
-        .button-group {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin-top: 30px;
-        }
-        
-        .btn {
-            padding: 12px 24px;
-            border-radius: 30px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            border: none;
-            min-width: 150px;
-        }
-        
-        .btn-primary {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: white;
-        }
-        
-        .btn-secondary {
-            background: transparent;
-            border: 1px solid var(--primary);
-            color: var(--primary);
-        }
-        
-        .btn-success {
-            background: linear-gradient(135deg, var(--success), #2ecc71);
-            color: white;
-            display: none;
-        }
-        
-        .completed-section {
-            display: none;
-            animation: fadeIn 1s ease-in;
-        }
-        
-        .checkmark {
-            width: 80px;
-            height: 80px;
-            margin: 0 auto;
-            display: block;
-        }
-        
-        .checkmark__circle {
-            stroke-dasharray: 166;
-            stroke-dashoffset: 166;
-            stroke-width: 2;
-            stroke-miterlimit: 10;
-            stroke: var(--success);
-            fill: none;
-            animation: stroke 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
-        }
-        
-        .checkmark__check {
-            transform-origin: 50% 50%;
-            stroke-dasharray: 48;
-            stroke-dashoffset: 48;
-            stroke: var(--success);
-            animation: stroke 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.8s forwards;
-        }
-        
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        
-        @keyframes stroke {
-            100% { stroke-dashoffset: 0; }
-        }
-    </style>
+  <style>
+    :root {
+      --primary: #6C5CE7;
+      --secondary: #00CEC9;
+      --ai-accent: #FF6B6B;
+      --success: #52BE80;
+      --bg: #F9F9F9;
+      --text: #2D3436;
+      --light: #FFFFFF;
+    }
+    
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      overflow: hidden;
+    }
+    
+    .installation-container {
+      width: 90%;
+      max-width: 600px;
+      background: rgba(255, 255, 255, 0.92);
+      border-radius: 24px;
+      padding: 30px;
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.08);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      text-align: center;
+    }
+    
+    h1 {
+      font-weight: 800;
+      margin-bottom: 15px;
+      background: linear-gradient(90deg, var(--primary), var(--ai-accent));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    
+    .ai-badge {
+      display: inline-block;
+      background-color: rgba(255, 107, 107, 0.15);
+      color: var(--ai-accent);
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      margin: 0 3px;
+      border: 1px solid rgba(255, 107, 107, 0.3);
+    }
+    
+    .progress-container {
+      margin: 30px 0;
+    }
+    
+    .progress-bar {
+      height: 10px;
+      background-color: rgba(108, 92, 231, 0.1);
+      border-radius: 5px;
+      overflow: hidden;
+      margin-bottom: 10px;
+    }
+    
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--primary), var(--secondary));
+      border-radius: 5px;
+      transition: width 0.5s ease-out;
+    }
+    
+    .progress-text {
+      font-family: 'Courier New', monospace;
+      font-weight: bold;
+      color: var(--primary);
+    }
+    
+    .status-message {
+      min-height: 60px;
+      margin: 20px 0;
+      font-size: 0.9rem;
+      color: var(--text);
+      opacity: 0.8;
+    }
+    
+    .loading-spinner {
+      width: 50px;
+      height: 50px;
+      border: 5px solid rgba(108, 92, 231, 0.1);
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      margin: 20px auto;
+      animation: spin 1s linear infinite;
+      display: none;
+    }
+    
+    .button-group {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin-top: 30px;
+    }
+    
+    .btn {
+      padding: 12px 24px;
+      border-radius: 30px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: none;
+      min-width: 150px;
+    }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: white;
+    }
+    
+    .btn-secondary {
+      background: transparent;
+      border: 1px solid var(--primary);
+      color: var(--primary);
+    }
+    
+    .btn-success {
+      background: linear-gradient(135deg, var(--success), #2ecc71);
+      color: white;
+      display: none;
+    }
+    
+    .completed-section {
+      display: none;
+      animation: fadeIn 1s ease-in;
+    }
+    
+    .checkmark {
+      width: 80px;
+      height: 80px;
+      margin: 0 auto;
+      display: block;
+    }
+    
+    .checkmark__circle {
+      stroke-dasharray: 166;
+      stroke-dashoffset: 166;
+      stroke-width: 2;
+      stroke-miterlimit: 10;
+      stroke: var(--success);
+      fill: none;
+      animation: stroke 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
+    }
+    
+    .checkmark__check {
+      transform-origin: 50% 50%;
+      stroke-dasharray: 48;
+      stroke-dashoffset: 48;
+      stroke: var(--success);
+      animation: stroke 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.8s forwards;
+    }
+    
+    /* Modal Konfirmasi */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      z-index: 100;
+      justify-content: center;
+      align-items: center;
+    }
+    
+    .modal-content {
+      background: white;
+      padding: 25px;
+      border-radius: 15px;
+      max-width: 400px;
+      text-align: center;
+      animation: fadeIn 0.3s ease-out;
+    }
+    
+    .modal-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin-top: 20px;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    
+    @keyframes stroke {
+      100% { stroke-dashoffset: 0; }
+    }
+  </style>
 </head>
 <body>
-    <div class="installation-container">
-        <h1>Titik Kumpul Kreasi <span class="ai-badge">AI Powered</span></h1>
-        <p class="subtitle">Mempersiapkan lingkungan AI untuk pengalaman optimal</p>
-        
-        <div id="installationProgress">
-            <div class="progress-container">
-                <div class="progress-bar">
-                    <div class="progress-fill" id="progressFill"></div>
-                </div>
-                <div class="progress-text" id="progressText">0%</div>
-            </div>
-            
-            <div class="status-message" id="statusMessage">
-                Klik "Mulai Instalasi" untuk memulai proses
-            </div>
-            
-            <div class="loading-spinner" id="loadingSpinner"></div>
-            
-            <div class="button-group">
-                <button class="btn btn-primary" id="startBtn">Mulai Instalasi</button>
-                <button class="btn btn-secondary" id="cancelBtn">Batalkan</button>
-            </div>
+  <div class="installation-container">
+    <h1>Titik Kumpul Kreasi <span class="ai-badge">AI Powered</span></h1>
+    <p class="subtitle">Mempersiapkan lingkungan AI untuk pengalaman optimal</p>
+    
+    <div id="installationProgress">
+      <div class="progress-container">
+        <div class="progress-bar">
+          <div class="progress-fill" id="progressFill"></div>
         </div>
-        
-        <div class="completed-section" id="completedSection">
-            <svg class="checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
-                <circle class="checkmark__circle" cx="26" cy="26" r="25" fill="none"/>
-                <path class="checkmark__check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
-            </svg>
-            <h2>Instalasi Berhasil!</h2>
-            <p class="status-message">Sistem siap digunakan dengan semua fitur AI</p>
-            <div class="button-group">
-                <button class="btn btn-success" id="continueBtn">Lanjutkan ke Platform</button>
-            </div>
-        </div>
+        <div class="progress-text" id="progressText">0%</div>
+      </div>
+      
+      <div class="status-message" id="statusMessage">
+        Klik "Mulai Instalasi" untuk memulai proses
+      </div>
+      
+      <div class="loading-spinner" id="loadingSpinner"></div>
+      
+      <div class="button-group">
+        <button class="btn btn-primary" id="startBtn">Mulai Instalasi</button>
+        <button class="btn btn-secondary" id="cancelBtn">Batalkan</button>
+      </div>
     </div>
+    
+    <div class="completed-section" id="completedSection">
+      <svg class="checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
+        <circle class="checkmark__circle" cx="26" cy="26" r="25" fill="none"/>
+        <path class="checkmark__check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+      </svg>
+      <h2>Instalasi Berhasil!</h2>
+      <p class="status-message">Sistem siap digunakan dengan semua fitur AI</p>
+      <div class="button-group">
+        <button class="btn btn-success" id="continueBtn">Lanjutkan ke Platform</button>
+      </div>
+    </div>
+  </div>
 
-    <script>
-        // DOM Elements
-        const startBtn = document.getElementById('startBtn');
-        const cancelBtn = document.getElementById('cancelBtn');
-        const continueBtn = document.getElementById('continueBtn');
-        const progressFill = document.getElementById('progressFill');
-        const progressText = document.getElementById('progressText');
-        const statusMessage = document.getElementById('statusMessage');
-        const loadingSpinner = document.getElementById('loadingSpinner');
-        const installationProgress = document.getElementById('installationProgress');
-        const completedSection = document.getElementById('completedSection');
-        
-        // Installation steps
-        const installationSteps = [
-            "Menginisialisasi sistem...",
-            "Memverifikasi koneksi jaringan...",
-            "Mengunduh komponen inti AI...",
-            "Mengkonfigurasi model bahasa...",
-            "Mempersiapkan modul gambar...",
-            "Menyiapkan lingkungan kolaborasi...",
-            "Mengoptimalkan performa...",
-            "Verifikasi akhir..."
-        ];
-        
-        // Event Listeners
-        startBtn.addEventListener('click', startInstallation);
-        cancelBtn.addEventListener('click', () => {
-            window.close(); // Close the browser tab/window
-        });
-        continueBtn.addEventListener('click', () => {
-            window.location.href = "index.html"; // Redirect to index page
-        });
-        
-        // Installation function
-        function startInstallation() {
-            // UI changes
-            startBtn.style.display = 'none';
-            cancelBtn.style.display = 'none';
-            loadingSpinner.style.display = 'block';
-            statusMessage.textContent = "Memulai proses instalasi...";
-            
-            let progress = 0;
-            const totalSteps = installationSteps.length;
-            const progressIncrement = 100 / totalSteps;
-            let currentStep = 0;
-            
-            // Simulate installation process
-            const installationInterval = setInterval(() => {
-                if (progress >= 100) {
-                    clearInterval(installationInterval);
-                    installationComplete();
-                    return;
-                }
-                
-                // Update progress
-                progress += progressIncrement;
-                progress = Math.min(progress, 100); // Ensure doesn't exceed 100%
-                
-                progressFill.style.width = `${progress}%`;
-                progressText.textContent = `${Math.round(progress)}%`;
-                
-                // Update status message
-                if (currentStep < totalSteps) {
-                    statusMessage.textContent = installationSteps[currentStep];
-                    currentStep++;
-                }
-                
-            }, 1500); // Update every 1.5 seconds
+  <!-- Modal Konfirmasi -->
+  <div class="modal" id="confirmationModal">
+    <div class="modal-content">
+      <h3>Konfirmasi Pembatalan</h3>
+      <p>Apakah Anda yakin ingin membatalkan proses instalasi?</p>
+      <div class="modal-buttons">
+        <button class="btn btn-secondary" id="confirmCancelBtn">Ya, Batalkan</button>
+        <button class="btn btn-primary" id="resumeBtn">Lanjutkan Instalasi</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // DOM Elements
+    const startBtn = document.getElementById('startBtn');
+    const cancelBtn = document.getElementById('cancelBtn');
+    const continueBtn = document.getElementById('continueBtn');
+    const progressFill = document.getElementById('progressFill');
+    const progressText = document.getElementById('progressText');
+    const statusMessage = document.getElementById('statusMessage');
+    const loadingSpinner = document.getElementById('loadingSpinner');
+    const installationProgress = document.getElementById('installationProgress');
+    const completedSection = document.getElementById('completedSection');
+    const confirmationModal = document.getElementById('confirmationModal');
+    const confirmCancelBtn = document.getElementById('confirmCancelBtn');
+    const resumeBtn = document.getElementById('resumeBtn');
+    
+    // Installation steps
+    const installationSteps = [
+      "Menginisialisasi sistem...",
+      "Memverifikasi koneksi jaringan...",
+      "Mengunduh komponen inti AI...",
+      "Mengkonfigurasi model bahasa...",
+      "Mempersiapkan modul gambar...",
+      "Menyiapkan lingkungan kolaborasi...",
+      "Mengoptimalkan performa...",
+      "Verifikasi akhir..."
+    ];
+    
+    // Track installation state
+    let installationInterval;
+    let isInstalling = false;
+    
+    // Event Listeners
+    startBtn.addEventListener('click', startInstallation);
+    cancelBtn.addEventListener('click', showCancelConfirmation);
+    continueBtn.addEventListener('click', () => {
+      window.location.href = "main.html";
+    });
+    confirmCancelBtn.addEventListener('click', cancelInstallation);
+    resumeBtn.addEventListener('click', hideCancelConfirmation);
+    
+    // Installation function
+    function startInstallation() {
+      isInstalling = true;
+      
+      // UI changes
+      startBtn.style.display = 'none';
+      cancelBtn.style.display = 'inline-block';
+      loadingSpinner.style.display = 'block';
+      statusMessage.textContent = "Memulai proses instalasi...";
+      
+      let progress = 0;
+      const totalSteps = installationSteps.length;
+      const progressIncrement = 100 / totalSteps;
+      let currentStep = 0;
+      
+      // Simulate installation process
+      installationInterval = setInterval(() => {
+        if (progress >= 100) {
+          clearInterval(installationInterval);
+          installationComplete();
+          return;
         }
         
-        function installationComplete() {
-            // Hide progress section and show completion
-            installationProgress.style.display = 'none';
-            completedSection.style.display = 'block';
-            
-            // Add slight delay before showing continue button
-            setTimeout(() => {
-                continueBtn.style.display = 'inline-block';
-            }, 500);
+        // Update progress
+        progress += progressIncrement;
+        progress = Math.min(progress, 100);
+        
+        progressFill.style.width = `${progress}%`;
+        progressText.textContent = `${Math.round(progress)}%`;
+        
+        // Update status message
+        if (currentStep < totalSteps) {
+          statusMessage.textContent = installationSteps[currentStep];
+          currentStep++;
         }
-    </script>
+        
+      }, 1500);
+    }
+    
+    function installationComplete() {
+      isInstalling = false;
+      installationProgress.style.display = 'none';
+      completedSection.style.display = 'block';
+      
+      setTimeout(() => {
+        continueBtn.style.display = 'inline-block';
+      }, 500);
+    }
+    
+    function showCancelConfirmation() {
+      if (isInstalling) {
+        confirmationModal.style.display = 'flex';
+      } else {
+        cancelInstallation();
+      }
+    }
+    
+    function hideCancelConfirmation() {
+      confirmationModal.style.display = 'none';
+    }
+    
+    function cancelInstallation() {
+      // Clear the installation interval if running
+      if (installationInterval) {
+        clearInterval(installationInterval);
+      }
+      
+      // Try to close the window
+      try {
+        // For popup windows opened via window.open()
+        if (window.opener) {
+          window.close();
+        } 
+        // For regular tabs (fallback)
+        else {
+          // Try to redirect to about:blank first
+          window.location.href = 'about:blank';
+          setTimeout(() => {
+            try {
+              window.close();
+            } catch (e) {
+              // Final fallback - redirect to homepage
+              window.location.href = 'https://titikkumpulkreasi.my.id';
+            }
+          }, 100);
+        }
+      } catch (e) {
+        // If all else fails, redirect to homepage
+        window.location.href = 'https://titikkumpulkreasi.my.id';
+      }
+      
+      // Hide confirmation modal
+      confirmationModal.style.display = 'none';
+    }
+  </script>
 </body>
 </html>
